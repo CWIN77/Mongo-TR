@@ -11,7 +11,7 @@ const connectDB = async (mongoInfo, redisInfo) => {
       console.info('MongoDB Connected!');
     } catch (err) {
       connected.mongo = null;
-      console.error('MongoDB Error');
+      console.error('MongoDB Error : ' + err);
     }
   }
 
@@ -26,22 +26,28 @@ const connectDB = async (mongoInfo, redisInfo) => {
     });
     redisClient.on('error', (err) => {
       connected.redis = null;
-      console.error('Redis Client Error');
+      console.error('Redis Error : ' + err);
     });
     await redisClient.connect().then();
     redisClient.v4;
   }
+
+  return connected;
 }
 
-const setData = async (data) => {
+const createData = async (addData, dataName, limit) => {
   if (connected.mongo && connected.redis) {
-    const redisCli = connected.v4;
-    const redisData = await redisCli.get('data');
+    const redisCli = connected.redis.v4;
+    const redisData = await redisCli.get(dataName);
     const { data } = JSON.parse(redisData);
-    data.push({ text: req.body.text });
-    await redisCli.set('data', JSON.stringify({ data }));
-  } else console.error("connectDB");
+    if (data) {
+      data.push(addData);
+      if (data.length >= limit) {
+        await schemas[dataName].create(addData);
+      } else await redisCli.set(dataName, JSON.stringify({ data }));
+    } else console.error("Schema has not been created.");
+  } else console.error("Please Connect database.");
 }
 
 
-module.exports = { connectDB, setData }
+module.exports = { connectDB, createData }
