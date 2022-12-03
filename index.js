@@ -35,7 +35,7 @@ const connectDB = async (mongoInfo, redisInfo) => {
 
 const setData = async (data) => {
   if (connected.mongo && connected.redis) {
-    const redisCli = connected.redis.v4;
+    const redisCli = connected.v4;
     const redisData = await redisCli.get('data');
     const { data } = JSON.parse(redisData);
     data.push({ text: req.body.text });
