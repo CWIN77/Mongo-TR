@@ -11,7 +11,7 @@ const connectDB = async (mongoInfo, redisInfo) => {
       console.info('MongoDB Connected!');
     } catch (err) {
       connected.mongo = null;
-      console.error('MongoDB Error : ' + err);
+      console.error('MongoDB Connect Error : ' + err);
     }
   }
 
@@ -26,7 +26,7 @@ const connectDB = async (mongoInfo, redisInfo) => {
     });
     redisClient.on('error', (err) => {
       connected.redis = null;
-      console.error('Redis Error : ' + err);
+      console.error('Redis Connect Error : ' + err);
     });
     await redisClient.connect().then();
     redisClient.v4;
@@ -49,5 +49,12 @@ const createData = async (addData, dataName, limit) => {
   } else console.error("Please Connect database.");
 }
 
+const updateData = async () => {
+
+}
+
+const getData = async () => {
+
+}
 
 module.exports = { connectDB, createData }
