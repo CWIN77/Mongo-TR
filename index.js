@@ -89,8 +89,13 @@ const findMany = async () => {
   if (connected.mongo && connected.redis) {
     const redisCli = connected.redis.v4;
     const redisData = await JSON.parse(redisCli.get(dataName));
-    redisData
+
   }
 }
+
+// CREATE 	create
+// READ 	find, findById, findOne
+// UPDATE 	updateOne, updateMany, findByIdAndUpdate, findOneAnd Update
+// DELETE 	deleteOne, deleteMany, findByIdAndDelete, findOneAndDelete
 
 module.exports = { connectDB, createData, updateOne, updateMany }
