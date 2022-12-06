@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const redis = require('redis');
 
 const connected = { mongo: null, redis: null };
+const schemas = {};
 
 const connectDB = async (mongoInfo, redisInfo) => {
   if (!connected.mongo) {
@@ -35,7 +36,7 @@ const connectDB = async (mongoInfo, redisInfo) => {
   return connected;
 }
 
-const createData = async (addData, dataName, limit) => {
+const createData = async (addData, dataName, limit = 1000) => {
   if (connected.mongo && connected.redis) {
     const redisCli = connected.redis.v4;
     const redisData = await redisCli.get(dataName);
@@ -49,12 +50,47 @@ const createData = async (addData, dataName, limit) => {
   } else console.error("Please Connect database.");
 }
 
-const updateData = async () => {
+const createSchema = async () => {
 
 }
 
-const getData = async () => {
-
+const updateOne = async (_id, changeData, dataName) => {
+  if (connected.mongo && connected.redis) {
+    const redisCli = connected.redis.v4;
+    const redisData = await JSON.parse(redisCli.get(dataName));
+    let isChange = false;
+    redisData.forEach((data, key) => {
+      if (data[_id] === _id) {
+        redisData[key] = changeData;
+        isChange = true;
+      }
+    });
+    if (!isChange) {
+      await schemas[dataName].updateOne({ _id }, changeData);
+    }
+  }
 }
 
-module.exports = { connectDB, createData }
+const updateMany = async (findKey, findValue, changeData, dataName) => {
+  if (connected.mongo && connected.redis) {
+    const redisCli = connected.redis.v4;
+    const redisData = await JSON.parse(redisCli.get(dataName));
+    const regex = new RegExp(findValue);
+    redisData.forEach((data, key) => {
+      if (regex.test(data[findKey])) {
+        redisData[key] = changeData;
+      }
+    });
+    await schemas[dataName].updateMany({ findKey: findValue }, changeData);
+  }
+}
+
+const findMany = async () => {
+  if (connected.mongo && connected.redis) {
+    const redisCli = connected.redis.v4;
+    const redisData = await JSON.parse(redisCli.get(dataName));
+    redisData
+  }
+}
+
+module.exports = { connectDB, createData, updateOne, updateMany }
