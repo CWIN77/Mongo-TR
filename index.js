@@ -85,10 +85,11 @@ const updateMany = async (findKey, findValue, changeData, dataName) => {
   }
 }
 
-const findMany = async () => {
+const findMany = async (findKey, findValue) => {
   if (connected.mongo && connected.redis) {
     const redisCli = connected.redis.v4;
     const redisData = await JSON.parse(redisCli.get(dataName));
+    const regex = new RegExp(findValue);
 
   }
 }
